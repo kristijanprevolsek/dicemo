@@ -88,6 +88,22 @@ su Muzej grada Rijeke, Pomorski i povijesni muzej i Državni arhiv u Rijeci.
 Najbolji efekt daje „danas“ fotografija snimljena **s istog mjesta i pod istim kutom** kao
 stara. Te bi se fotografije isplatilo snimiti same.
 
+## Igra: putovnica, kviz i značke
+
+- **Pečat:** dobiva se kad korisnik fizički dođe do znamenitosti.
+- **Kviz:** na dnu priče je jedno pitanje (`src/data/quiz.ts`), otključano tek na licu mjesta.
+  Ako je odgovor točan iz prve, pečat dobiva zvjezdicu ★.
+- **Značke** (`src/data/badges.ts`): Prvi pečat, Stari grad, Trsatski hodočasnik, Uz more,
+  Znalac, Šetač i Riječki vodič. Kad korisnik osvoji značku, iskače obavijest.
+- **Nagrada:** primjer „kava u partnerskom kafiću“ nakon 10 pečata. Partneri još nisu
+  dogovoreni, a kod je zasad samo prikaz. Za stvarne nagrade kod treba izdavati i
+  provjeravati na serveru, da se ne može lažirati.
+- Tab **Putovnica** prikazuje pečate, nagradu i značke s napretkom.
+
+Napredak se sprema lokalno (`src/progress/ProgressContext.tsx`). Za stvarne nagrade i rang
+liste treba ga prebaciti u Firestore. U tom slučaju pečat treba potvrditi i na serveru, jer
+se GPS lokacija može lažirati.
+
 ## Događanja (tab)
 
 Tab **Događanja** prikazuje koncerte, kazalište, sport i ostala događanja u Rijeci i okolici
@@ -135,6 +151,9 @@ src/
 scripts/fetch-photos.mjs skidanje fotografija s Wikimedia Commonsa
   auth/AuthContext.tsx   Firebase prijava (e-mail, Google, demo gost)
   data/walks.ts          tematske šetnje
+  data/quiz.ts           pitanje za svaku znamenitost
+  data/badges.ts         značke i nagrada
+  progress/              napredak korisnika (pečati, kviz, šetnje)
   data/photos.json       stare i današnje fotografije (+ autor i licenca)
   data/events.ts         model događanja + primjer podataka
   lib/events.ts          učitavanje feeda, filtriranje na 10 dana, grupiranje po danu
@@ -150,6 +169,7 @@ Nova znamenitost dodaje se kao novi zapis u `src/data/landmarks.ts`.
 - [ ] Zamijeniti primjer fotografija stvarnim starim i današnjim fotografijama.
 - [ ] Za produkciju zamijeniti javne OSM pločice komercijalnim pružateljem (MapTiler, Stadia,
       Mapbox). Uvjeti korištenja OSM-a ne dopuštaju veći promet aplikacija.
-- [ ] Prebaciti napredak („posjećeno“) iz `localStorage` u Firestore radi sinkronizacije između uređaja.
+- [ ] Prebaciti napredak (pečati, kviz, značke) iz `localStorage` u Firestore radi sinkronizacije između uređaja.
+- [ ] Dogovoriti partnere za nagrade i izdavati kodove na serveru.
 - [ ] Obavijesti u pozadini (zaključan mobitel): geofencing plugin i lokalne notifikacije.
 - [ ] Snimljeni audio vodič umjesto sintetiziranog glasa; engleska i talijanska verzija.

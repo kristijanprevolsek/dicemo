@@ -3,6 +3,7 @@ import { categoryLabels, type Landmark } from '../data/landmarks'
 import { formatDistance } from '../lib/geo'
 import { photos } from '../data/photos'
 import { ThenNow } from './ThenNow'
+import { QuizCard } from './QuizCard'
 
 interface Props {
   landmark: Landmark
@@ -53,6 +54,7 @@ export function StoryPanel({ landmark, distance, visited, onClose }: Props) {
         {landmark.story.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
+        <QuizCard key={landmark.id} landmarkId={landmark.id} unlocked={visited} />
       </div>
     </section>
   )

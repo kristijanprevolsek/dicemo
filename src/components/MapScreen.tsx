@@ -8,7 +8,7 @@ import { useProximity } from '../hooks/useProximity'
 import { useWalkRoute } from '../hooks/useWalkRoute'
 import type { Walk } from '../data/walks'
 import { distanceMeters, formatDistance, type Position } from '../lib/geo'
-import { loadVisited, saveVisited } from '../lib/storage'
+import { useProgress } from '../progress/ProgressContext'
 import { NearbyToast } from './NearbyToast'
 import { StoryPanel } from './StoryPanel'
 import { WalkBanner } from './WalkBanner'
@@ -67,7 +67,8 @@ export function MapScreen({ walk, onEndWalk }: Props) {
   const { position: gpsPosition, status } = useLocation(!simulate)
   const position = simulate ? simPosition : gpsPosition
 
-  const [visited, setVisited] = useState(() => loadVisited(user!.uid))
+  const { progress, markVisited, completeWalk } = useProgress()
+  const visited = useMemo(() => new Set(progress.visited), [progress.visited])
   // Ulazak u radijus znači da je korisnik bio tamo.
   const [selected, setSelected] = useState<Landmark | null>(null)
   // Napredak po šetnji: id šetnje → id-evi dosegnutih točaka
@@ -79,24 +80,25 @@ export function MapScreen({ walk, onEndWalk }: Props) {
   const markReached = useCallback(
     (id: string) => {
       if (!walk) return
-      setReachedByWalk((prev) => {
-        const list = prev[walk.id] ?? []
-        return list.includes(id) ? prev : { ...prev, [walk.id]: [...list, id] }
-      })
+      const list = reachedByWalk[walk.id] ?? []
+      if (list.includes(id)) return
+      const next = [...list, id]
+      setReachedByWalk((prev) => ({ ...prev, [walk.id]: next }))
+      if (walk.stops.every((s) => next.includes(s.landmarkId))) completeWalk(walk.id)
     },
-    [walk],
+    [walk, reachedByWalk, completeWalk],
   )
 
   const onEnter = useCallback(
     (l: Landmark) => {
-      setVisited((prev) => (prev.has(l.id) ? prev : new Set(prev).add(l.id)))
+      markVisited(l.id)
       // Na točki šetnje odmah otvori priču.
       if (walk?.stops.some((s) => s.landmarkId === l.id)) {
         markReached(l.id)
         setSelected(l)
       }
     },
-    [walk, markReached],
+    [walk, markReached, markVisited],
   )
   const { nearby, dismiss } = useProximity(position, landmarks, onEnter)
 
@@ -109,8 +111,6 @@ export function MapScreen({ walk, onEndWalk }: Props) {
   }
   const [showList, setShowList] = useState(false)
   const [flyTarget, setFlyTarget] = useState<Position | null>(null)
-
-  useEffect(() => saveVisited(user!.uid, visited), [user, visited])
 
   const open = (l: Landmark) => {
     setSelected(l)

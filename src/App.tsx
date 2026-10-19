@@ -5,6 +5,9 @@ import { LoginScreen } from './components/LoginScreen'
 import { MapScreen } from './components/MapScreen'
 import { TabBar, type Tab } from './components/TabBar'
 import { WalksScreen } from './components/WalksScreen'
+import { PassportScreen } from './components/PassportScreen'
+import { BadgeToast } from './components/BadgeToast'
+import { ProgressProvider } from './progress/ProgressContext'
 import type { Walk } from './data/walks'
 
 function Shell() {
@@ -22,7 +25,9 @@ function Shell() {
           }}
         />
       )}
+      {tab === 'putovnica' && <PassportScreen />}
       {tab === 'dogadanja' && <EventsScreen />}
+      <BadgeToast />
       <TabBar active={tab} onChange={setTab} />
     </div>
   )
@@ -32,7 +37,13 @@ function Root() {
   const { user, loading } = useAuth()
   if (loading) return <div className="splash">Dićemo</div>
   // key: novi korisnik dobiva svježe stanje (posjećene znamenitosti, simulacija…)
-  return user ? <Shell key={user.uid} /> : <LoginScreen />
+  return user ? (
+    <ProgressProvider key={user.uid} uid={user.uid}>
+      <Shell />
+    </ProgressProvider>
+  ) : (
+    <LoginScreen />
+  )
 }
 
 export default function App() {
