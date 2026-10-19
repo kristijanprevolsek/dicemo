@@ -48,6 +48,46 @@ Lokacija ide preko `@capacitor/geolocation`, koji na webu koristi preglednik, a 
 Android treba dodati [`@capacitor-firebase/authentication`](https://github.com/capawesome-team/capacitor-firebase/tree/main/packages/authentication)
 i u `src/auth/AuthContext.tsx` na nativnoj platformi pozvati njegov `signInWithGoogle()`.
 
+## Šetnje
+
+Tab **Šetnje** nudi tematske rute (`src/data/walks.ts`): „Rijeka u 60 minuta“ i „Trsat“.
+Nakon pokretanja ruta se iscrta na karti s numeriranim točkama. Banner pokazuje sljedeću
+točku, udaljenost do nje i kratku uputu. Kad korisnik stigne na točku, sama se otvori
+njezina priča, a može i ručno potvrditi „Stigao sam“.
+
+Pješačka linija dolazi s javnog OSRM poslužitelja `routing.openstreetmap.de`. Ako servis nije
+dostupan, između točaka se crtaju isprekidane ravne linije. Za produkciju treba vlastiti ili
+komercijalni servis za rute (GraphHopper, Mapbox, OpenRouteService).
+
+Nova šetnja je novi zapis u `walks.ts`: popis id-eva znamenitosti redom, uz kratke upute.
+
+## Nekad i sad (stare fotografije)
+
+U panelu priče, ako znamenitost ima fotografije, prikazuje se usporedba stare i današnje
+fotografije s klizačem. Ako postoji samo jedna fotografija, prikazuje se samo ona. Podaci su u
+`src/data/photos.json`. Trenutno je unutra samo **primjer s nacrtanim zamjenskim slikama** za
+katedralu sv. Vida, i treba ga zamijeniti.
+
+### Dodavanje fotografija s Wikimedia Commonsa
+
+Na [Commonsu](https://commons.wikimedia.org/wiki/Category:Old_photographs_of_Rijeka) ima puno
+starih razglednica i fotografija Rijeke (Fiume) u javnom vlasništvu.
+
+1. Pronađi fotografiju i kopiraj naziv datoteke, npr. `File:Fiume Duomo 1900.jpg`.
+2. Upiši je u `scripts/photo-sources.json`:
+   ```json
+   { "katedrala-sv-vida": { "then": "File:….jpg", "thenYear": "oko 1900.", "now": "File:….jpg" } }
+   ```
+3. Pokreni `npm run photos`. Skripta skine slike u `public/photos/` i u `photos.json` upiše
+   autora, licencu i poveznicu na izvor. Aplikacija ih prikazuje ispod fotografije.
+
+Unos se može dodati i ručno u `photos.json`, npr. za vlastite fotografije ili one iz muzeja.
+Za fotografije koje nisu u javnom vlasništvu treba dopuštenje vlasnika. Kandidati za suradnju
+su Muzej grada Rijeke, Pomorski i povijesni muzej i Državni arhiv u Rijeci.
+
+Najbolji efekt daje „danas“ fotografija snimljena **s istog mjesta i pod istim kutom** kao
+stara. Te bi se fotografije isplatilo snimiti same.
+
 ## Događanja (tab)
 
 Tab **Događanja** prikazuje koncerte, kazalište, sport i ostala događanja u Rijeci i okolici
@@ -91,7 +131,11 @@ src/
   data/landmarks.ts      znamenitosti: koordinate, radijus okidanja, priče
   hooks/useLocation.ts   praćenje GPS lokacije (web + nativno)
   hooks/useProximity.ts  otkriva ulazak u radijus znamenitosti
+  hooks/useWalkRoute.ts  pješačka ruta šetnje (OSRM, s fallbackom)
+scripts/fetch-photos.mjs skidanje fotografija s Wikimedia Commonsa
   auth/AuthContext.tsx   Firebase prijava (e-mail, Google, demo gost)
+  data/walks.ts          tematske šetnje
+  data/photos.json       stare i današnje fotografije (+ autor i licenca)
   data/events.ts         model događanja + primjer podataka
   lib/events.ts          učitavanje feeda, filtriranje na 10 dana, grupiranje po danu
   components/            prijava, karta, događanja, tab bar, panel s pričom
@@ -102,7 +146,8 @@ Nova znamenitost dodaje se kao novi zapis u `src/data/landmarks.ts`.
 ## Prije objave
 
 - [ ] **Provjeriti koordinate** svih znamenitosti na terenu (trenutno su približne).
-- [ ] **Stručno pregledati tekstove priča** (povjesničar ili TZ Rijeka) i dodati fotografije.
+- [ ] **Stručno pregledati tekstove priča** (povjesničar ili TZ Rijeka).
+- [ ] Zamijeniti primjer fotografija stvarnim starim i današnjim fotografijama.
 - [ ] Za produkciju zamijeniti javne OSM pločice komercijalnim pružateljem (MapTiler, Stadia,
       Mapbox). Uvjeti korištenja OSM-a ne dopuštaju veći promet aplikacija.
 - [ ] Prebaciti napredak („posjećeno“) iz `localStorage` u Firestore radi sinkronizacije između uređaja.

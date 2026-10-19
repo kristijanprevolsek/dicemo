@@ -1,0 +1,14 @@
+{
+  "katedrala-sv-vida": {
+    "then": {
+      "src": "photos/primjer-nekad.svg",
+      "year": "primjer",
+      "credit": "Primjer – zamijeni pravom starom fotografijom (npm run photos)"
+    },
+    "now": {
+      "src": "photos/primjer-sada.svg",
+      "year": "danas",
+      "credit": "Primjer – zamijeni pravom fotografijom"
+    }
+  }
+}

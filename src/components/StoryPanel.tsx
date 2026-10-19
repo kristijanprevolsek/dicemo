@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { categoryLabels, type Landmark } from '../data/landmarks'
 import { formatDistance } from '../lib/geo'
+import { photos } from '../data/photos'
+import { ThenNow } from './ThenNow'
 
 interface Props {
   landmark: Landmark
@@ -42,6 +44,7 @@ export function StoryPanel({ landmark, distance, visited, onClose }: Props) {
         <button className="icon-btn" onClick={onClose} aria-label="Zatvori">✕</button>
       </header>
       <div className="sheet-body">
+        {photos[landmark.id] && <ThenNow photos={photos[landmark.id]} alt={landmark.name} />}
         {canSpeak && (
           <button className="btn btn-secondary btn-small" onClick={toggleSpeech}>
             {speaking ? '■ Zaustavi' : '▶ Poslušaj priču'}

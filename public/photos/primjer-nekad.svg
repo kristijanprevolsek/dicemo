@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+<defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9dcc2"/><stop offset="1" stop-color="#cdb994"/></linearGradient><filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/><feColorMatrix values="0 0 0 0 0.35  0 0 0 0 0.27  0 0 0 0 0.18  0 0 0 0.25 0"/></filter></defs>
+<rect width="800" height="600" fill="url(#s)"/>
+<rect y="470" width="800" height="130" fill="#a8916a"/>
+<g fill="#8a7350">
+<rect x="250" y="250" width="300" height="220"/>
+<path d="M260 250 Q400 120 540 250 Z"/>
+<rect x="385" y="120" width="30" height="40"/>
+<rect x="120" y="330" width="130" height="140"/><rect x="550" y="310" width="140" height="160"/>
+</g>
+<g fill="#a8916a" opacity="0.55"><rect x="370" y="380" width="60" height="90" rx="30"/><rect x="290" y="300" width="30" height="50" rx="15"/><rect x="480" y="300" width="30" height="50" rx="15"/></g>
+<rect width="800" height="600" filter="url(#g)"/>
+<rect x="24" y="24" width="300" height="56" rx="10" fill="#000" opacity="0.55"/>
+<text x="44" y="61" font-family="Georgia, serif" font-size="28" fill="#fff">NEKAD · primjer</text>
+</svg>
