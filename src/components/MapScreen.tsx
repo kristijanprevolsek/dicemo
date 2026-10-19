@@ -1,23 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import L from 'leaflet'
-import { Circle, CircleMarker, MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
+import { Circle, CircleMarker, MapContainer, Marker, Polyline, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { landmarks, RIJEKA_CENTER, type Landmark } from '../data/landmarks'
 import { useAuth } from '../auth/AuthContext'
 import { useLocation } from '../hooks/useLocation'
 import { useProximity } from '../hooks/useProximity'
+import { useWalkRoute } from '../hooks/useWalkRoute'
+import type { Walk } from '../data/walks'
 import { distanceMeters, formatDistance, type Position } from '../lib/geo'
 import { loadVisited, saveVisited } from '../lib/storage'
 import { NearbyToast } from './NearbyToast'
 import { StoryPanel } from './StoryPanel'
+import { WalkBanner } from './WalkBanner'
 
 const iconCache = new Map<string, L.DivIcon>()
-function landmarkIcon(l: Landmark, visited: boolean, selected: boolean) {
-  const key = `${l.category}-${visited}-${selected}`
+function landmarkIcon(l: Landmark, visited: boolean, selected: boolean, walkNumber?: number, dim = false) {
+  const key = `${l.category}-${visited}-${selected}-${walkNumber}-${dim}`
   let icon = iconCache.get(key)
   if (!icon) {
+    const cls = ['pin', `pin-${l.category}`, visited && 'pin-visited', selected && 'pin-selected', dim && 'pin-dim']
     icon = L.divIcon({
       className: '',
-      html: `<div class="pin pin-${l.category}${visited ? ' pin-visited' : ''}${selected ? ' pin-selected' : ''}"></div>`,
+      html: `<div class="${cls.filter(Boolean).join(' ')}">${walkNumber ? `<span>${walkNumber}</span>` : ''}</div>`,
       iconSize: [28, 28],
       iconAnchor: [14, 28],
     })
@@ -39,7 +43,24 @@ function FlyTo({ target }: { target: Position | null }) {
   return null
 }
 
-export function MapScreen() {
+function FitRoute({ walkId, coords }: { walkId: string; coords: [number, number][] }) {
+  const map = useMap()
+  useEffect(() => {
+    if (coords.length) map.fitBounds(coords, { paddingTopLeft: [40, 320], paddingBottomRight: [70, 40] })
+    // samo pri pokretanju šetnje, ne pri svakom osvježenju rute
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walkId, map])
+  return null
+}
+
+const landmarkById = new Map(landmarks.map((l) => [l.id, l]))
+
+interface Props {
+  walk: Walk | null
+  onEndWalk: () => void
+}
+
+export function MapScreen({ walk, onEndWalk }: Props) {
   const { user, signOut } = useAuth()
   const [simulate, setSimulate] = useState(false)
   const [simPosition, setSimPosition] = useState<Position | null>(null)
@@ -48,12 +69,44 @@ export function MapScreen() {
 
   const [visited, setVisited] = useState(() => loadVisited(user!.uid))
   // Ulazak u radijus znači da je korisnik bio tamo.
-  const markVisited = useCallback(
-    (l: Landmark) => setVisited((prev) => (prev.has(l.id) ? prev : new Set(prev).add(l.id))),
-    [],
-  )
-  const { nearby, dismiss } = useProximity(position, landmarks, markVisited)
   const [selected, setSelected] = useState<Landmark | null>(null)
+  // Napredak po šetnji: id šetnje → id-evi dosegnutih točaka
+  const [reachedByWalk, setReachedByWalk] = useState<Record<string, string[]>>({})
+  const reached = walk ? (reachedByWalk[walk.id] ?? []) : []
+  const targetStop = walk?.stops.find((s) => !reached.includes(s.landmarkId))
+  const target = targetStop ? landmarkById.get(targetStop.landmarkId)! : null
+
+  const markReached = useCallback(
+    (id: string) => {
+      if (!walk) return
+      setReachedByWalk((prev) => {
+        const list = prev[walk.id] ?? []
+        return list.includes(id) ? prev : { ...prev, [walk.id]: [...list, id] }
+      })
+    },
+    [walk],
+  )
+
+  const onEnter = useCallback(
+    (l: Landmark) => {
+      setVisited((prev) => (prev.has(l.id) ? prev : new Set(prev).add(l.id)))
+      // Na točki šetnje odmah otvori priču.
+      if (walk?.stops.some((s) => s.landmarkId === l.id)) {
+        markReached(l.id)
+        setSelected(l)
+      }
+    },
+    [walk, markReached],
+  )
+  const { nearby, dismiss } = useProximity(position, landmarks, onEnter)
+
+  const walkPoints = useMemo(() => (walk ? walk.stops.map((s) => landmarkById.get(s.landmarkId)!) : []), [walk])
+  const route = useWalkRoute(walkPoints)
+
+  const endWalk = () => {
+    if (walk) setReachedByWalk((prev) => ({ ...prev, [walk.id]: [] }))
+    onEndWalk()
+  }
   const [showList, setShowList] = useState(false)
   const [flyTarget, setFlyTarget] = useState<Position | null>(null)
 
@@ -96,14 +149,26 @@ export function MapScreen() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {landmarks.map((l) => (
+        {route && <Polyline positions={route.coords} pathOptions={{ color: '#0b5f8a', weight: 5, opacity: 0.75, dashArray: route.routed ? undefined : '8 10' }} />}
+        {walk && route && <FitRoute walkId={walk.id} coords={route.coords} />}
+        {landmarks.map((l) => {
+          const stopIndex = walk ? walk.stops.findIndex((s) => s.landmarkId === l.id) : -1
+          return (
           <Marker
             key={l.id}
             position={[l.lat, l.lng]}
-            icon={landmarkIcon(l, visited.has(l.id), selected?.id === l.id)}
+            zIndexOffset={stopIndex >= 0 ? 1000 : 0}
+            icon={landmarkIcon(
+              l,
+              visited.has(l.id),
+              selected?.id === l.id || target?.id === l.id,
+              stopIndex >= 0 ? stopIndex + 1 : undefined,
+              !!walk && stopIndex < 0,
+            )}
             eventHandlers={{ click: () => open(l) }}
           />
-        ))}
+          )
+        })}
         {position && (
           <>
             {!!position.accuracy && position.accuracy < 200 && (
@@ -129,7 +194,21 @@ export function MapScreen() {
         )}
       </div>
 
-      {nearby && !selected && (
+      {walk && !selected && !showList && (
+        <WalkBanner
+          walk={walk}
+          reachedCount={reached.length}
+          target={target}
+          hint={targetStop?.hint}
+          distance={position && target ? distanceMeters(position, target) : null}
+          routed={route?.routed ?? true}
+          onStory={() => target && open(target)}
+          onNext={() => target && markReached(target.id)}
+          onEnd={endWalk}
+        />
+      )}
+
+      {nearby && !selected && !walk && (
         <NearbyToast
           landmark={nearby}
           onOpen={() => {

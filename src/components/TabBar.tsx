@@ -1,7 +1,8 @@
-export type Tab = 'karta' | 'dogadanja'
+export type Tab = 'karta' | 'setnje' | 'dogadanja'
 
 const tabs: { id: Tab; label: string; icon: string }[] = [
   { id: 'karta', label: 'Karta', icon: '🗺️' },
+  { id: 'setnje', label: 'Šetnje', icon: '🚶' },
   { id: 'dogadanja', label: 'Događanja', icon: '📅' },
 ]
 
