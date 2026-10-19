@@ -48,6 +48,42 @@ Lokacija ide preko `@capacitor/geolocation`, koji na webu koristi preglednik, a 
 Android treba dodati [`@capacitor-firebase/authentication`](https://github.com/capawesome-team/capacitor-firebase/tree/main/packages/authentication)
 i u `src/auth/AuthContext.tsx` na nativnoj platformi pozvati njegov `signInWithGoogle()`.
 
+## Događanja (tab)
+
+Tab **Događanja** prikazuje koncerte, kazalište, sport i ostala događanja u Rijeci i okolici
+za sljedećih 10 dana, s filtrima po kategoriji i području (Rijeka / okolica).
+
+Aplikacija čita jedan JSON feed (`VITE_EVENTS_FEED_URL`). To je polje objekata u formatu
+`CityEvent` iz `src/data/events.ts`:
+
+```json
+[{ "id": "hnk-2026-10-21", "title": "…", "category": "kazaliste",
+   "start": "2026-10-21T19:30:00+02:00", "venue": "HNK Ivana pl. Zajca",
+   "place": "Rijeka", "price": "od 15 €", "url": "https://…" }]
+```
+
+Dok feed nije postavljen, prikazuje se **primjer podataka** s jasnom oznakom da događanja nisu stvarna.
+
+### Kako puniti feed
+
+Za Rijeku ne postoji jedan javni API sa svim događanjima, pa feed puni mali pozadinski
+**agregator**. Najjednostavnije je napraviti Firebase Cloud Function koja se pokreće
+svakih nekoliko sati, skupi podatke iz izvora, ukloni duplikate i zapiše rezultat u
+Firestore ili kao JSON u Storage.
+
+| Izvor | Što pokriva | Način |
+|---|---|---|
+| TZ grada Rijeke (visitrijeka.hr) | gradske manifestacije, festivali | dogovor o feedu ili scraping kalendara |
+| HNK Ivana pl. Zajca | opera, drama, balet | raspored s weba |
+| HNK Rijeka / HNL | nogometne utakmice | raspored lige (npr. API-Football ima HNL) |
+| Entrio, Ulaznice.hr | koncerti, klubovi, predstave | partnerski pristup / affiliate feed |
+| Ticketmaster Discovery API | veliki koncerti | javni API (slaba pokrivenost u HR) |
+| TZ Opatija, Kastav, Kvarner | okolica | njihovi kalendari |
+| Ručni unos | sve ostalo | jednostavan obrazac za organizatore (admin u Firestoreu) |
+
+Prije scrapinga treba provjeriti uvjete korištenja svake stranice. Bolje je dogovoriti
+partnerstvo, npr. s TZ-om, kojima je u interesu da se njihova događanja vide.
+
 ## Struktura
 
 ```
@@ -56,7 +92,9 @@ src/
   hooks/useLocation.ts   praćenje GPS lokacije (web + nativno)
   hooks/useProximity.ts  otkriva ulazak u radijus znamenitosti
   auth/AuthContext.tsx   Firebase prijava (e-mail, Google, demo gost)
-  components/            prijava, karta, obavijest, panel s pričom
+  data/events.ts         model događanja + primjer podataka
+  lib/events.ts          učitavanje feeda, filtriranje na 10 dana, grupiranje po danu
+  components/            prijava, karta, događanja, tab bar, panel s pričom
 ```
 
 Nova znamenitost dodaje se kao novi zapis u `src/data/landmarks.ts`.

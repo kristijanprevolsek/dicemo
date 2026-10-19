@@ -107,9 +107,9 @@ export function MapScreen() {
         {position && (
           <>
             {!!position.accuracy && position.accuracy < 200 && (
-              <Circle center={[position.lat, position.lng]} radius={position.accuracy} pathOptions={{ className: 'accuracy' }} />
+              <Circle center={[position.lat, position.lng]} radius={position.accuracy} pathOptions={{ color: '#1a73e8', weight: 1, opacity: 0.3, fillOpacity: 0.12 }} />
             )}
-            <CircleMarker center={[position.lat, position.lng]} radius={8} pathOptions={{ className: 'me' }} />
+            <CircleMarker center={[position.lat, position.lng]} radius={8} pathOptions={{ color: '#fff', weight: 3, fillColor: '#1a73e8', fillOpacity: 1 }} />
           </>
         )}
         {simulate && <SimulateClicks onPick={setSimPosition} />}
