@@ -1,0 +1,209 @@
+export type Category = 'sakralno' | 'povijest' | 'kultura' | 'more'
+
+export interface Landmark {
+  id: string
+  name: string
+  category: Category
+  lat: number
+  lng: number
+  /** Udaljenost (m) na kojoj se korisniku nudi priča. */
+  radius: number
+  summary: string
+  story: string[]
+}
+
+// NAPOMENA: koordinate su približne i treba ih provjeriti na terenu prije objave.
+// Tekstove priča prije objave treba pregledati povjesničar / turistička zajednica.
+export const landmarks: Landmark[] = [
+  {
+    id: 'katedrala-sv-vida',
+    name: 'Katedrala sv. Vida',
+    category: 'sakralno',
+    lat: 45.32776,
+    lng: 14.44322,
+    radius: 45,
+    summary: 'Barokna rotonda posvećena zaštitniku Rijeke.',
+    story: [
+      'Katedralu sv. Vida počeli su graditi isusovci 1638. godine na mjestu starije crkve posvećene svetom Vidu, zaštitniku grada. Kao uzor poslužila je venecijanska crkva Santa Maria della Salute, pa je Rijeka dobila rijetku kružnu baroknu građevinu – rotondu.',
+      'Gradnja je trajala dugo i protezala se kroz cijelo 18. stoljeće, a pročelje je dovršeno tek kasnije. Crkva je postala katedrala nakon osnivanja riječke biskupije u 20. stoljeću.',
+      'Najpoznatiji predmet u crkvi je gotičko raspelo iz 13. stoljeća. Prema legendi, 1296. godine kockar Petar Lončarić, ljut zbog gubitka, bacio je kamen na raspelo – iz Kristova tijela potekla je krv, a zemlja je progutala bogohulnika. Kamen se i danas čuva uz raspelo, a legenda je dio identiteta Rijeke.',
+    ],
+  },
+  {
+    id: 'stara-vrata',
+    name: 'Stara vrata (Rimski luk)',
+    category: 'povijest',
+    lat: 45.3276,
+    lng: 14.4426,
+    radius: 35,
+    summary: 'Ostaci rimske Tarsatike u srcu Staroga grada.',
+    story: [
+      'Na mjestu današnje Rijeke nalazilo se rimsko naselje Tarsatica. Luk koji Riječani zovu Stara vrata najstariji je sačuvani spomenik grada.',
+      'Dugo se vjerovalo da je riječ o slavoluku, no arheolozi su utvrdili da je luk bio ulaz u kasnoantički pretorij – zapovjedno središte vojnog obrambenog sustava Claustra Alpium Iuliarum, koji je štitio Italiju od upada s istoka.',
+      'Oko luka su vidljivi ostaci temelja zgrada pretorija, pa ovdje doslovno stojiš na sloju grada starom više od 1600 godina.',
+    ],
+  },
+  {
+    id: 'gradski-toranj',
+    name: 'Gradski toranj',
+    category: 'povijest',
+    lat: 45.32704,
+    lng: 14.44222,
+    radius: 40,
+    summary: 'Simbol Korza i nekadašnja vrata grada prema moru.',
+    story: [
+      'Gradski toranj nekoć je bio glavni ulaz u srednjovjekovni grad s morske strane. Kad su gradske zidine srušene, a obala se nasipavanjem pomaknula prema jugu, toranj je ostao usred Korza – glavne riječke šetnice.',
+      'Današnji barokni izgled dobio je u 18. stoljeću. Iznad prolaza nalaze se grb grada i dvoglavi orao te poprsja habsburških careva Leopolda I. i Karla VI., koji je Rijeku 1719. proglasio slobodnom lukom.',
+      'Sat na tornju postavljen je u drugoj polovici 19. stoljeća i od tada Riječanima služi kao omiljeno mjesto za dogovor: "Vidimo se pod urom!"',
+    ],
+  },
+  {
+    id: 'kosi-toranj',
+    name: 'Kosi toranj crkve Uznesenja BDM',
+    category: 'sakralno',
+    lat: 45.3268,
+    lng: 14.4438,
+    radius: 35,
+    summary: 'Riječki "kosi toranj" iz 14. stoljeća.',
+    story: [
+      'Zvonik crkve Uznesenja Blažene Djevice Marije, koju Riječani zovu Velika crkva, potječe iz 14. stoljeća i jedna je od najstarijih građevina u gradu.',
+      'Zbog mekanog, nasutog tla na kojem je sagrađen, zvonik se tijekom stoljeća vidljivo nagnuo – zato ga zovu riječkim kosim tornjem.',
+      'Sama crkva više je puta pregrađivana, pa se u njoj isprepliću romanički, gotički i barokni slojevi.',
+    ],
+  },
+  {
+    id: 'trsatske-stube',
+    name: 'Trsatske stube Petra Kružića',
+    category: 'povijest',
+    lat: 45.3295,
+    lng: 14.4465,
+    radius: 40,
+    summary: 'Hodočasnički put od grada do Trsata.',
+    story: [
+      'Stube koje vode od doline Rječine do Trsata dao je sagraditi senjski kapetan Petar Kružić 1531. godine, kako bi hodočasnici lakše stigli do svetišta Gospe Trsatske.',
+      'Kružić je poznat kao junački branitelj Klisa od Osmanlija. Stube su kroz stoljeća proširivane i obnavljane, a uz njih se nalaze kapelice u kojima su se hodočasnici zaustavljali na molitvi.',
+      'Danas su stube omiljena ruta za trening i najljepši pješački put prema Trsatu – uz pogled na grad koji se s penjanjem sve više otvara.',
+    ],
+  },
+  {
+    id: 'gospa-trsatska',
+    name: 'Svetište Gospe Trsatske',
+    category: 'sakralno',
+    lat: 45.3324,
+    lng: 14.4543,
+    radius: 50,
+    summary: 'Najstarije hrvatsko marijansko svetište.',
+    story: [
+      'Prema predaji, anđeli su 1291. godine donijeli Nazaretsku kućicu – dom Svete obitelji – iz Nazareta upravo na Trsat. Tri godine kasnije kućica je nestala i "preselila" se u talijanski Loreto.',
+      'Kako bi utješio Trsaćane, papa Urban V. poslao je 1367. svetištu sliku Majke Božje, koja se i danas ovdje štuje. Uz crkvu djeluje franjevački samostan.',
+      'Svetište je posjetio papa Ivan Pavao II. 2003. godine. Njemu u spomen ispred crkve stoji kip, a riznica čuva brojne zavjetne darove pomoraca.',
+    ],
+  },
+  {
+    id: 'trsatska-gradina',
+    name: 'Trsatska gradina',
+    category: 'povijest',
+    lat: 45.3318,
+    lng: 14.456,
+    radius: 55,
+    summary: 'Frankopanska utvrda s pogledom na Kvarner.',
+    story: [
+      'Utvrda na brežuljku iznad kanjona Rječine stoji na mjestu prapovijesne i rimske promatračnice. U srednjem vijeku pripadala je knezovima Frankopanima, koji su s Trsata nadzirali put od mora prema unutrašnjosti.',
+      'Godine 1826. kupio ju je irski plemić i austrijski maršal Laval Nugent te je obnovio u romantičarskom duhu. Na gradini je dao podići obiteljski mauzolej u obliku malog grčkog hrama.',
+      'S bedema se pruža jedan od najljepših pogleda na Rijeku, Kvarnerski zaljev i otoke – osobito u zalazak sunca.',
+    ],
+  },
+  {
+    id: 'trznica',
+    name: 'Gradska tržnica',
+    category: 'kultura',
+    lat: 45.3256,
+    lng: 14.4401,
+    radius: 45,
+    summary: 'Secesijska ribarnica i paviljoni s kraja 19. stoljeća.',
+    story: [
+      'Riječka tržnica sastoji se od paviljona od željeza i stakla sagrađenih krajem 19. stoljeća i zgrade ribarnice podignute uoči Prvog svjetskog rata.',
+      'Ribarnica je secesijski dragulj: kameni ukrasi prikazuju ribe, rakove, školjke i druga morska bića – kao da je more izašlo na pročelje zgrade.',
+      'Ujutro je ovo najživlje mjesto u gradu: dođi oko devet, uzmi kavu i promatraj kako se cjenka za srdele i sezonsko voće.',
+    ],
+  },
+  {
+    id: 'hnk-zajc',
+    name: 'HNK Ivana pl. Zajca',
+    category: 'kultura',
+    lat: 45.3262,
+    lng: 14.4386,
+    radius: 50,
+    summary: 'Kazalište s oslikom mladog Gustava Klimta.',
+    story: [
+      'Zgradu kazališta otvorenu 1885. projektirao je bečki studio Fellner & Helmer, autori desetaka kazališta diljem Srednje Europe.',
+      'Strop gledališta oslikali su Gustav i Ernst Klimt te Franz Matsch – Gustav Klimt tada je bio mlad umjetnik, daleko od slave koju će steći bečkom secesijom.',
+      'Kazalište nosi ime riječkog skladatelja Ivana pl. Zajca, autora opere "Nikola Šubić Zrinjski".',
+    ],
+  },
+  {
+    id: 'kapucinska-crkva',
+    name: 'Crkva Gospe Lurdske',
+    category: 'sakralno',
+    lat: 45.3283,
+    lng: 14.4357,
+    radius: 45,
+    summary: 'Neogotička kapucinska crkva iznad Žabice.',
+    story: [
+      'Kapucinska crkva Gospe Lurdske, s dvokrakim stubištem i bogatim neogotičkim pročeljem, jedna je od najupečatljivijih građevina na ulazu u grad.',
+      'Gradnja je započela početkom 20. stoljeća, a zbog nedostatka novca i ratova trajala je desetljećima.',
+      'Iz vremena gradnje ostala je i priča o prevari: novac za crkvu skupljala je navodna vidjelica koja je tvrdila da ima stigme – kad se otkrilo da je riječ o prijevari, skandal je odjeknuo cijelom Monarhijom.',
+    ],
+  },
+  {
+    id: 'guvernerova-palaca',
+    name: 'Guvernerova palača',
+    category: 'kultura',
+    lat: 45.3307,
+    lng: 14.4398,
+    radius: 50,
+    summary: 'Sjedište ugarskih guvernera, danas muzej.',
+    story: [
+      'Palaču je krajem 19. stoljeća projektirao budimpeštanski arhitekt Alajos Hauszmann kao sjedište guvernera Rijeke, koja je tada bila pod ugarskom upravom.',
+      'U njoj se 1919. smjestio Gabriele D\'Annunzio, talijanski pjesnik koji je s dragovoljcima zauzeo grad i ovdje vodio svoju kratkotrajnu "Talijansku regenciju Carnaro".',
+      'Danas je u palači Pomorski i povijesni muzej Hrvatskog primorja – svečane dvorane i zbirke pomorske prošlosti vrijede posjeta.',
+    ],
+  },
+  {
+    id: 'molo-longo',
+    name: 'Molo longo',
+    category: 'more',
+    lat: 45.323,
+    lng: 14.439,
+    radius: 80,
+    summary: 'Dugi lukobran – omiljena riječka šetnica uz more.',
+    story: [
+      'Molo longo je lukobran dug gotovo dva kilometra, sagrađen u 19. stoljeću kada je Rijeka postajala glavna luka Ugarske.',
+      'Desetljećima je bio zatvoren kao dio lučkog područja, a danas je otvoren za šetnju i jedno je od najljepših mjesta za pogled na grad s mora.',
+      'Ljeti se uz njega kupaju hrabriji Riječani, a zimi ovdje puše bura koja zna podići valove preko zida.',
+    ],
+  },
+  {
+    id: 'torpedo',
+    name: 'Lansirna stanica torpeda',
+    category: 'more',
+    lat: 45.3291,
+    lng: 14.4148,
+    radius: 60,
+    summary: 'Ovdje je rođen prvi torpedo na svijetu.',
+    story: [
+      'Rijeka je kolijevka torpeda. Ideju o "obalnom spasitelju" razvio je umirovljeni austrijski časnik Ivan Vukić (Giovanni Luppis), a engleski inženjer Robert Whitehead pretvorio ju je 1866. u prvi samohodni torpedo.',
+      'Whiteheadova tvornica u Rijeci izvozila je torpeda mornaricama diljem svijeta. Lansirna stanica na moru služila je za testiranje – torpeda su se ispaljivala prema pučini i mjerila im se putanja.',
+      'Zanimljivost: Whiteheadova unuka Agathe udala se za Georga von Trappa – obitelj poznatu iz filma "Moje pjesme, moji snovi".',
+    ],
+  },
+]
+
+export const categoryLabels: Record<Category, string> = {
+  sakralno: 'Sakralno',
+  povijest: 'Povijest',
+  kultura: 'Kultura',
+  more: 'More i luka',
+}
+
+export const RIJEKA_CENTER: [number, number] = [45.3271, 14.4422]
