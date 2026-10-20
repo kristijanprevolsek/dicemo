@@ -11,7 +11,7 @@ const root = fileURLToPath(new URL('..', import.meta.url))
 const API = process.env.COMMONS_API ?? 'https://commons.wikimedia.org/w/api.php'
 const WIDTH = 1200
 // Wikimedia traži opisni User-Agent: https://meta.wikimedia.org/wiki/User-Agent_policy
-const headers = { 'User-Agent': 'DicemoApp/0.1 (https://github.com/kristijanprevolsek/dicemo)' }
+const headers = { 'User-Agent': 'LokalloApp/0.1 (https://github.com/kristijanprevolsek/dicemo)' }
 
 const stripHtml = (s = '') => s.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
 

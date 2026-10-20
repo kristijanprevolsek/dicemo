@@ -20,7 +20,7 @@ export interface ContentRepo {
   editableCities(uid: string): Promise<string[] | null>
 }
 
-const LOCAL_KEY = 'dicemo:content'
+const LOCAL_KEY = 'lokallo:content'
 
 function merge(overrides: City[]): City[] {
   const byId = new Map(bundledCities.map((c) => [c.id, c]))

@@ -4,7 +4,7 @@ import { badgesFor, isEarned, type Badge, type Progress } from '../data/badges'
 
 // Lokalna pohrana napretka. Kasnije se može prebaciti u Firestore radi sinkronizacije
 // između uređaja.
-const key = (uid: string, cityId: string) => `dicemo:progress:${uid}:${cityId}`
+const key = (uid: string, cityId: string) => `lokallo:progress:${uid}:${cityId}`
 const empty: Progress = { visited: [], quiz: {}, walks: [] }
 
 function load(uid: string, cityId: string): Progress {
@@ -13,9 +13,9 @@ function load(uid: string, cityId: string): Progress {
     if (saved) return { ...empty, ...JSON.parse(saved) }
     if (cityId !== 'rijeka') return empty
     // stariji formati (dok je postojala samo Rijeka)
-    const old = localStorage.getItem(`dicemo:progress:${uid}`)
+    const old = localStorage.getItem(`lokallo:progress:${uid}`)
     if (old) return { ...empty, ...JSON.parse(old) }
-    const legacy = localStorage.getItem(`dicemo:visited:${uid}`)
+    const legacy = localStorage.getItem(`lokallo:visited:${uid}`)
     return legacy ? { ...empty, visited: JSON.parse(legacy) } : empty
   } catch {
     return empty

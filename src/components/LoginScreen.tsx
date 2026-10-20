@@ -30,7 +30,7 @@ export function LoginScreen() {
   return (
     <main className="login">
       <div className="login-card">
-        <h1 className="brand">Dićemo</h1>
+        <h1 className="brand">Lokallo</h1>
         <p className="tagline">Prošeći gradom i poslušaj priče koje čuva.</p>
 
         <button className="btn btn-google" disabled={busy || demoMode} onClick={() => run(signInGoogle)}>

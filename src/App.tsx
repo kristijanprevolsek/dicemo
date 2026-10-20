@@ -37,7 +37,7 @@ function Shell() {
 function Root() {
   const { user, loading } = useAuth()
   const { city } = useCity()
-  if (loading) return <div className="splash">Dićemo</div>
+  if (loading) return <div className="splash">Lokallo</div>
   return user ? (
     // key: promjena korisnika ili grada daje svježe stanje (karta, napredak, šetnja)
     <ProgressProvider key={`${user.uid}:${city.id}`} uid={user.uid} city={city}>

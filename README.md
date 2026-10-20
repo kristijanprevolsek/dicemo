@@ -1,4 +1,4 @@
-# Dićemo – priče hrvatskih gradova
+# Lokallo – priče hrvatskih gradova
 
 Interaktivna karta grada sa znamenitostima, trenutno za **Rijeku, Zagreb i Osijek**. Kad korisnik prolazi pored neke znamenitosti
 (npr. katedrale sv. Vida), aplikacija mu ponudi priču o njoj, koju može pročitati ili poslušati.

@@ -25,7 +25,7 @@ export function AdminApp() {
       .catch((e) => setError(e instanceof Error ? e.message : String(e)))
   }, [user])
 
-  if (loading) return <div className="splash">Dićemo</div>
+  if (loading) return <div className="splash">Lokallo</div>
   if (!user) return <LoginScreen />
   if (error) return <AdminMessage title="Greška pri učitavanju" text={error} onSignOut={signOut} />
   if (!cities || allowed === undefined) return <div className="splash">Učitavam…</div>
@@ -65,7 +65,7 @@ export function AdminApp() {
   return (
     <div className="admin">
       <header className="admin-header">
-        <h1 className="brand brand-small">Dićemo · uređivanje</h1>
+        <h1 className="brand brand-small">Lokallo · uređivanje</h1>
         <select value={current?.id ?? ''} onChange={(e) => setCityId(e.target.value)}>
           {editable.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>

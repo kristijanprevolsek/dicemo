@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { contentRepo, loadInitialCities } from '../content/repository'
 import type { City } from './types'
 
-const STORAGE_KEY = 'dicemo:city'
+const STORAGE_KEY = 'lokallo:city'
 
 interface CityValue {
   city: City

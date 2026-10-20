@@ -52,7 +52,7 @@ export function PassportScreen() {
           <div className="reward-main">
             <strong>{reward.title}</strong>
             {rewardReady ? (
-              <p className="small">Pokaži ovaj kod konobaru: <code>DICEMO-{user?.uid.slice(0, 4).toUpperCase()}</code></p>
+              <p className="small">Pokaži ovaj kod konobaru: <code>LOKALLO-{user?.uid.slice(0, 4).toUpperCase()}</code></p>
             ) : (
               <p className="small muted">Još {reward.stamps - stamps} pečata do nagrade.</p>
             )}
