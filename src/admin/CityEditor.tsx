@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { bundledCities } from '../cities'
+import { isBundledCity } from '../cities'
 import type { City } from '../cities/types'
 import { validateCities } from '../cities/validate'
 import { contentRepo } from '../content/repository'
@@ -14,7 +14,7 @@ interface Props {
   published: City
   allCities: City[]
   editorUid: string
-  onPublished: (city: City | null) => void
+  onPublished: (city: City | null) => void | Promise<void>
 }
 
 export function CityEditor({ published, allCities, editorUid, onPublished }: Props) {
@@ -30,7 +30,7 @@ export function CityEditor({ published, allCities, editorUid, onPublished }: Pro
     () => validateCities(allCities.map((c) => (c.id === draft.id ? draft : c))),
     [draft, allCities],
   ).filter((e) => e.includes(draft.name) || e.includes(draft.id))
-  const isBundled = bundledCities.some((c) => c.id === draft.id)
+  const isBundled = isBundledCity(draft.id)
 
   const update = (fn: (c: City) => City) => {
     setDraft(fn)

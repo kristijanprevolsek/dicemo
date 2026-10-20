@@ -51,7 +51,7 @@ function Root() {
 export default function App() {
   return (
     <AuthProvider>
-      <CityProvider>
+      <CityProvider fallback={<div className="splash">Lokallo</div>}>
         <Root />
       </CityProvider>
     </AuthProvider>

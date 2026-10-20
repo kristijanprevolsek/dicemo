@@ -20,6 +20,14 @@ service cloud.firestore {
       allow write: if canEdit(cityId);
     }
 
+    // Popis gradova {id: sažetak}: jedan dokument, pa ga aplikacija čita jednim čitanjem.
+    // Urednik smije mijenjati samo zapise svojih gradova.
+    match /meta/cities {
+      allow read: if true;
+      allow write: if isEditor() && ('*' in editorCities()
+        || request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(editorCities()));
+    }
+
     match /editors/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;

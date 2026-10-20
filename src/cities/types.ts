@@ -69,3 +69,25 @@ export interface City {
   /** Primjer događanja dok se ne spoji pravi feed – nisu stvarna događanja. */
   sampleEvents: SampleEvent[]
 }
+
+/** Sažetak grada za popis i prepoznavanje lokacije – učitava se bez cijelog sadržaja. */
+export interface CityInfo {
+  id: string
+  name: string
+  inName: string
+  center: [number, number]
+  landmarks: number
+  walks: number
+  /** Verzija objavljenog sadržaja (ms); nema je za ugrađeni sadržaj. */
+  version?: number
+}
+
+export const infoOf = (city: City, version?: number): CityInfo => ({
+  id: city.id,
+  name: city.name,
+  inName: city.inName,
+  center: city.center,
+  landmarks: city.landmarks.length,
+  walks: city.walks.length,
+  ...(version ? { version } : {}),
+})

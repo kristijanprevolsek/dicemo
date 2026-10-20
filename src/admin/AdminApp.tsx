@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
-import { bundledCities } from '../cities'
+import { loadBundledCity } from '../cities'
 import type { City } from '../cities/types'
 import { LoginScreen } from '../components/LoginScreen'
-import { contentRepo } from '../content/repository'
+import { contentRepo, loadAllCities } from '../content/repository'
 import { CityEditor } from './CityEditor'
 import { newCity, slugify } from './util'
 
@@ -17,7 +17,7 @@ export function AdminApp() {
 
   useEffect(() => {
     if (!user) return
-    Promise.all([contentRepo.load(), contentRepo.editableCities(user.uid)])
+    Promise.all([loadAllCities(contentRepo), contentRepo.editableCities(user.uid)])
       .then(([list, editable]) => {
         setCities(list)
         setAllowed(editable)
@@ -52,14 +52,12 @@ export function AdminApp() {
     setNewName('')
   }
 
-  const onPublished = (city: City | null) => {
-    if (city) setCities(cities.map((c) => (c.id === city.id ? city : c)))
-    else {
-      // vraćeno na izvorno / obrisano
-      const original = bundledCities.find((c) => c.id === current?.id)
-      setCities(original ? cities.map((c) => (c.id === original.id ? original : c)) : cities.filter((c) => c.id !== current?.id))
-      if (!original) setCityId(null)
-    }
+  const onPublished = async (city: City | null) => {
+    if (city) return setCities(cities.map((c) => (c.id === city.id ? city : c)))
+    // vraćeno na izvorno / obrisano
+    const original = current ? await loadBundledCity(current.id) : null
+    setCities(original ? cities.map((c) => (c.id === original.id ? original : c)) : cities.filter((c) => c.id !== current?.id))
+    if (!original) setCityId(null)
   }
 
   return (

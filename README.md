@@ -23,9 +23,10 @@ primjer događanja (tip `City` u `src/cities/types.ts`).
 
 1. Kopiraj `src/cities/osijek/` (najmanji primjer) u npr. `src/cities/split/` i promijeni sadržaj.
    Id-evi znamenitosti moraju biti jedinstveni u svim gradovima, pa koristi prefiks (`st-…`).
-2. Dodaj grad u popis u `src/cities/index.ts`.
+2. Dodaj grad u katalog u `src/cities/index.ts` (sažetak + `load`).
 3. Pokreni `npm run check-cities`. Skripta provjerava da šetnje, pitanja i značke pokazuju na
-   postojeće znamenitosti, da svaka znamenitost ima pitanje i da koordinate nisu daleko od grada.
+   postojeće znamenitosti, da svaka znamenitost ima pitanje, da koordinate nisu daleko od grada
+   i da sažetak u katalogu odgovara sadržaju.
 
 Gradovi se mogu dodavati i kroz admin sučelje (vidi dolje), bez izmjena koda.
 
@@ -45,13 +46,23 @@ uređivanje sadržaja gradova, bez programiranja:
   točkom. Tu su i „Odbaci“, „Vrati izvorno“ te **Izvezi/Uvezi JSON**, zgodno ako turistička
   zajednica pošalje sadržaj kao datoteku.
 
-### Gdje se sprema
+### Gdje se sprema i kako se učitava
 
 - **Bez Firebasea (demo):** izmjene se spremaju u preglednik, u isti localStorage kao i
   aplikacija. Aplikacija na istom računalu odmah ih vidi, ali nitko drugi ne.
-- **S Firebaseom:** izmjene idu u Firestore (`cities/{id}`), a aplikacija ih učitava pri
-  pokretanju. Ugrađeni sadržaj iz `src/cities/` služi kao početni sadržaj i rezerva ako baza
-  nije dostupna. Za novi grad ili ispravak priče nije potrebna nova verzija aplikacije.
+- **S Firebaseom:** objava zapisuje grad u `cities/{id}`, a njegov sažetak s novom verzijom
+  u jedan dokument `meta/cities` (popis gradova). Ugrađeni sadržaj iz `src/cities/` služi kao
+  početni sadržaj i rezerva. Za novi grad ili ispravak priče ne treba nova verzija aplikacije.
+
+Aplikacija nikad ne učitava sve gradove:
+
+1. Pri otvaranju čita samo popis gradova (`meta/cities`, **jedno čitanje**, bez obzira na
+   broj gradova).
+2. Sadržaj preuzima **samo za odabrani grad**. Objavljeni grad sprema na uređaj s verzijom i
+   ponovno ga preuzima tek kad se verzija promijeni. Uobičajeno otvaranje je zato jedno malo
+   čitanje.
+3. Ugrađeni gradovi su zasebni dijelovi koda (6–13 kB) i preuzimaju se tek kad se odaberu.
+4. Firestore SDK se učitava naknadno, pa prvi prikaz spremljenog grada ne čeka na njega.
 
 ### Postavljanje urednika (Firebase)
 

@@ -21,7 +21,7 @@ export function CityPicker({ onClose }: { onClose: () => void }) {
               <span className="list-text">
                 <strong>{c.name}</strong>
                 <span className="muted small">
-                  {c.landmarks.length} znamenitosti · {c.walks.length} {c.walks.length === 1 ? 'šetnja' : 'šetnje'}
+                  {c.landmarks} znamenitosti · {c.walks} {c.walks === 1 ? 'šetnja' : 'šetnje'}
                 </span>
               </span>
               <span className="muted small">{c.id === current.id ? '✓' : ''}</span>
