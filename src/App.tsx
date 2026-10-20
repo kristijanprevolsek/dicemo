@@ -8,7 +8,8 @@ import { WalksScreen } from './components/WalksScreen'
 import { PassportScreen } from './components/PassportScreen'
 import { BadgeToast } from './components/BadgeToast'
 import { ProgressProvider } from './progress/ProgressContext'
-import type { Walk } from './data/walks'
+import type { Walk } from './cities/types'
+import { CityProvider, useCity } from './cities/CityContext'
 
 function Shell() {
   const [tab, setTab] = useState<Tab>('karta')
@@ -35,10 +36,11 @@ function Shell() {
 
 function Root() {
   const { user, loading } = useAuth()
+  const { city } = useCity()
   if (loading) return <div className="splash">Dićemo</div>
-  // key: novi korisnik dobiva svježe stanje (posjećene znamenitosti, simulacija…)
   return user ? (
-    <ProgressProvider key={user.uid} uid={user.uid}>
+    // key: promjena korisnika ili grada daje svježe stanje (karta, napredak, šetnja)
+    <ProgressProvider key={`${user.uid}:${city.id}`} uid={user.uid} city={city}>
       <Shell />
     </ProgressProvider>
   ) : (
@@ -49,7 +51,9 @@ function Root() {
 export default function App() {
   return (
     <AuthProvider>
-      <Root />
+      <CityProvider>
+        <Root />
+      </CityProvider>
     </AuthProvider>
   )
 }

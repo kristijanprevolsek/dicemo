@@ -1,16 +1,20 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { badges, isEarned, type Badge, type Progress } from '../data/badges'
+import type { City } from '../cities/types'
+import { badgesFor, isEarned, type Badge, type Progress } from '../data/badges'
 
 // Lokalna pohrana napretka. Kasnije se može prebaciti u Firestore radi sinkronizacije
 // između uređaja.
-const key = (uid: string) => `dicemo:progress:${uid}`
+const key = (uid: string, cityId: string) => `dicemo:progress:${uid}:${cityId}`
 const empty: Progress = { visited: [], quiz: {}, walks: [] }
 
-function load(uid: string): Progress {
+function load(uid: string, cityId: string): Progress {
   try {
-    const saved = localStorage.getItem(key(uid))
+    const saved = localStorage.getItem(key(uid, cityId))
     if (saved) return { ...empty, ...JSON.parse(saved) }
-    // stariji format: samo popis posjećenih
+    if (cityId !== 'rijeka') return empty
+    // stariji formati (dok je postojala samo Rijeka)
+    const old = localStorage.getItem(`dicemo:progress:${uid}`)
+    if (old) return { ...empty, ...JSON.parse(old) }
     const legacy = localStorage.getItem(`dicemo:visited:${uid}`)
     return legacy ? { ...empty, visited: JSON.parse(legacy) } : empty
   } catch {
@@ -20,6 +24,8 @@ function load(uid: string): Progress {
 
 interface ProgressValue {
   progress: Progress
+  /** Značke trenutnog grada */
+  badges: Badge[]
   markVisited: (id: string) => void
   answerQuiz: (id: string, correct: boolean) => void
   completeWalk: (id: string) => void
@@ -30,19 +36,20 @@ interface ProgressValue {
 
 const ProgressContext = createContext<ProgressValue | null>(null)
 
-export function ProgressProvider({ uid, children }: { uid: string; children: ReactNode }) {
-  const [progress, setProgress] = useState(() => load(uid))
+export function ProgressProvider({ uid, city, children }: { uid: string; city: City; children: ReactNode }) {
+  const [progress, setProgress] = useState(() => load(uid, city.id))
+  const badges = useMemo(() => badgesFor(city), [city])
   const [newBadge, setNewBadge] = useState<Badge | null>(null)
   // Ref drži najnovije stanje kako se uzastopne izmjene u istom trenutku ne bi pregazile.
   const latest = useRef(progress)
 
   useEffect(() => {
     try {
-      localStorage.setItem(key(uid), JSON.stringify(progress))
+      localStorage.setItem(key(uid, city.id), JSON.stringify(progress))
     } catch {
       // pohrana nije dostupna (privatni način) – napredak vrijedi samo za ovu sesiju
     }
-  }, [uid, progress])
+  }, [uid, city.id, progress])
 
   const update = useCallback((fn: (p: Progress) => Progress) => {
     const prev = latest.current
@@ -52,7 +59,7 @@ export function ProgressProvider({ uid, children }: { uid: string; children: Rea
     setProgress(next)
     const unlocked = badges.find((b) => !isEarned(b, prev) && isEarned(b, next))
     if (unlocked) setNewBadge(unlocked)
-  }, [])
+  }, [badges])
 
   // Akcije su stabilne (ne mijenjaju se s napretkom), pa se mogu koristiti u ovisnostima hookova.
   const actions = useMemo(
@@ -65,7 +72,10 @@ export function ProgressProvider({ uid, children }: { uid: string; children: Rea
     }),
     [update],
   )
-  const value = useMemo<ProgressValue>(() => ({ ...actions, progress, newBadge }), [actions, progress, newBadge])
+  const value = useMemo<ProgressValue>(
+    () => ({ ...actions, progress, newBadge, badges }),
+    [actions, progress, newBadge, badges],
+  )
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>
 }

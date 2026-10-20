@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { categoryLabels, type Landmark } from '../data/landmarks'
+import { categoryLabels, type Landmark } from '../cities/types'
 import { formatDistance } from '../lib/geo'
 import { photos } from '../data/photos'
 import { ThenNow } from './ThenNow'

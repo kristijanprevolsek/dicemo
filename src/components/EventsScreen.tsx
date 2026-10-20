@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { eventCategoryLabels, DAYS_AHEAD, type CityEvent, type EventCategory } from '../data/events'
 import { dayKey, dayLabel, loadEvents, timeLabel } from '../lib/events'
+import { useCity } from '../cities/CityContext'
 
-type Area = 'sve' | 'rijeka' | 'okolica'
-const areaLabels: Record<Area, string> = { sve: 'Sve', rijeka: 'Rijeka', okolica: 'Okolica' }
+type Area = 'sve' | 'grad' | 'okolica'
 
 export function EventsScreen() {
+  const { city } = useCity()
+  const areaLabels: Record<Area, string> = { sve: 'Sve', grad: city.name, okolica: 'Okolica' }
   const [events, setEvents] = useState<CityEvent[] | null>(null)
   const [isSample, setIsSample] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -13,19 +15,19 @@ export function EventsScreen() {
   const [area, setArea] = useState<Area>('sve')
 
   useEffect(() => {
-    loadEvents()
+    loadEvents(city)
       .then((r) => {
         setEvents(r.events)
         setIsSample(r.isSample)
       })
       .catch((e) => setError(e instanceof Error ? e.message : 'Greška pri učitavanju.'))
-  }, [])
+  }, [city])
 
   const groups = useMemo(() => {
     const filtered = (events ?? []).filter(
       (e) =>
         (!category || e.category === category) &&
-        (area === 'sve' || (area === 'rijeka') === (e.place === 'Rijeka')),
+        (area === 'sve' || (area === 'grad') === (e.place === city.name)),
     )
     const byDay = new Map<string, CityEvent[]>()
     for (const e of filtered) {
@@ -33,13 +35,13 @@ export function EventsScreen() {
       byDay.set(k, [...(byDay.get(k) ?? []), e])
     }
     return [...byDay.entries()]
-  }, [events, category, area])
+  }, [events, category, area, city.name])
 
   return (
     <div className="screen">
       <header className="screen-header">
         <h1 className="brand brand-small">Događanja</h1>
-        <p className="muted small">Rijeka i okolica · sljedećih {DAYS_AHEAD} dana</p>
+        <p className="muted small">{city.name} i okolica · sljedećih {DAYS_AHEAD} dana</p>
 
         <div className="chips" role="group" aria-label="Kategorija">
           <button className={`filter${!category ? ' filter-on' : ''}`} onClick={() => setCategory(null)}>Sve</button>
@@ -81,7 +83,7 @@ export function EventsScreen() {
                   <h3>{e.title}</h3>
                   <p className="muted small">
                     {e.venue}
-                    {e.place !== 'Rijeka' && ` · ${e.place}`}
+                    {e.place !== city.name && ` · ${e.place}`}
                     {e.price && ` · ${e.price}`}
                   </p>
                   {e.description && <p className="small">{e.description}</p>}

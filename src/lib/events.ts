@@ -1,3 +1,4 @@
+import type { City } from '../cities/types'
 import { DAYS_AHEAD, sampleEvents, type CityEvent } from '../data/events'
 
 const FEED_URL = import.meta.env.VITE_EVENTS_FEED_URL
@@ -9,18 +10,20 @@ export interface EventsResult {
 }
 
 /**
- * Učitava događanja u sljedećih DAYS_AHEAD dana. Izvor je JSON feed (polje CityEvent
- * objekata) koji puni pozadinski agregator. Bez feeda vraća primjer podataka.
+ * Učitava događanja grada u sljedećih DAYS_AHEAD dana. Izvor je JSON feed (polje CityEvent
+ * objekata, `?city=<id>`) koji puni pozadinski agregator. Bez feeda vraća primjer podataka.
  */
-export async function loadEvents(now = new Date()): Promise<EventsResult> {
+export async function loadEvents(city: City, now = new Date()): Promise<EventsResult> {
   let events: CityEvent[]
   let isSample = false
   if (FEED_URL) {
-    const res = await fetch(FEED_URL)
+    const url = new URL(FEED_URL, location.href)
+    url.searchParams.set('city', city.id)
+    const res = await fetch(url)
     if (!res.ok) throw new Error(`Feed događanja nije dostupan (${res.status})`)
     events = await res.json()
   } else {
-    events = sampleEvents(now)
+    events = sampleEvents(city, now)
     isSample = true
   }
 

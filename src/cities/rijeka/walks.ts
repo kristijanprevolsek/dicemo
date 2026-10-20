@@ -1,16 +1,4 @@
-export interface WalkStop {
-  landmarkId: string
-  /** Kratka uputa kako doći do ove točke od prethodne. */
-  hint?: string
-}
-
-export interface Walk {
-  id: string
-  title: string
-  durationMin: number
-  description: string
-  stops: WalkStop[]
-}
+import type { Walk } from '../types'
 
 export const walks: Walk[] = [
   {

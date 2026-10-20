@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import L from 'leaflet'
 import { Circle, CircleMarker, MapContainer, Marker, Polyline, TileLayer, useMap, useMapEvents } from 'react-leaflet'
-import { landmarks, RIJEKA_CENTER, type Landmark } from '../data/landmarks'
+import type { Landmark, Walk } from '../cities/types'
+import { useCity } from '../cities/CityContext'
+import { nearestCity } from '../cities'
 import { useAuth } from '../auth/AuthContext'
 import { useLocation } from '../hooks/useLocation'
 import { useProximity } from '../hooks/useProximity'
 import { useWalkRoute } from '../hooks/useWalkRoute'
-import type { Walk } from '../data/walks'
 import { distanceMeters, formatDistance, type Position } from '../lib/geo'
 import { useProgress } from '../progress/ProgressContext'
 import { NearbyToast } from './NearbyToast'
 import { StoryPanel } from './StoryPanel'
 import { WalkBanner } from './WalkBanner'
+import { CityPicker } from './CityPicker'
 
 const iconCache = new Map<string, L.DivIcon>()
 function landmarkIcon(l: Landmark, visited: boolean, selected: boolean, walkNumber?: number, dim = false) {
@@ -53,8 +55,6 @@ function FitRoute({ walkId, coords }: { walkId: string; coords: [number, number]
   return null
 }
 
-const landmarkById = new Map(landmarks.map((l) => [l.id, l]))
-
 interface Props {
   walk: Walk | null
   onEndWalk: () => void
@@ -62,6 +62,11 @@ interface Props {
 
 export function MapScreen({ walk, onEndWalk }: Props) {
   const { user, signOut } = useAuth()
+  const { city, setCity } = useCity()
+  const { landmarks } = city
+  const landmarkById = useMemo(() => new Map(landmarks.map((l) => [l.id, l])), [landmarks])
+  const [showCities, setShowCities] = useState(false)
+  const [cityHintDismissed, setCityHintDismissed] = useState(false)
   const [simulate, setSimulate] = useState(false)
   const [simPosition, setSimPosition] = useState<Position | null>(null)
   const { position: gpsPosition, status } = useLocation(!simulate)
@@ -102,7 +107,10 @@ export function MapScreen({ walk, onEndWalk }: Props) {
   )
   const { nearby, dismiss } = useProximity(position, landmarks, onEnter)
 
-  const walkPoints = useMemo(() => (walk ? walk.stops.map((s) => landmarkById.get(s.landmarkId)!) : []), [walk])
+  const walkPoints = useMemo(
+    () => (walk ? walk.stops.map((s) => landmarkById.get(s.landmarkId)!) : []),
+    [walk, landmarkById],
+  )
   const route = useWalkRoute(walkPoints)
 
   const endWalk = () => {
@@ -121,7 +129,11 @@ export function MapScreen({ walk, onEndWalk }: Props) {
   const sorted = useMemo(() => {
     if (!position) return landmarks
     return [...landmarks].sort((a, b) => distanceMeters(position, a) - distanceMeters(position, b))
-  }, [position])
+  }, [position, landmarks])
+
+  // Korisnik je fizički u drugom podržanom gradu – ponudi prebacivanje.
+  const detectedCity = position ? nearestCity(position) : null
+  const suggestCity = detectedCity && detectedCity.id !== city.id && !cityHintDismissed ? detectedCity : null
 
   const statusText = simulate
     ? 'Simulacija: dodirni kartu za pomicanje'
@@ -131,7 +143,10 @@ export function MapScreen({ walk, onEndWalk }: Props) {
     <div className="app">
       <header className="topbar">
         <div>
-          <h1 className="brand brand-small">Dićemo</h1>
+          <button className="city-switch" onClick={() => setShowCities(true)} aria-label="Promijeni grad">
+            <h1 className="brand brand-small">{city.name}</h1>
+            <span aria-hidden="true">▾</span>
+          </button>
           <p className="muted small">
             {visited.size}/{landmarks.length} otkriveno · {statusText}
           </p>
@@ -144,7 +159,7 @@ export function MapScreen({ walk, onEndWalk }: Props) {
         </div>
       </header>
 
-      <MapContainer center={RIJEKA_CENTER} zoom={15} className="map" zoomControl={false}>
+      <MapContainer center={city.center} zoom={city.zoom} className="map" zoomControl={false}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -194,6 +209,21 @@ export function MapScreen({ walk, onEndWalk }: Props) {
         )}
       </div>
 
+      {suggestCity && !walk && !selected && (
+        <div className="toast" role="status">
+          <div>
+            <p className="toast-kicker">Čini se da si {suggestCity.inName}</p>
+            <p className="toast-title">Prebaciti na {suggestCity.name}?</p>
+          </div>
+          <div className="toast-actions">
+            <button className="btn btn-primary btn-small" onClick={() => setCity(suggestCity.id)}>Prebaci</button>
+            <button className="icon-btn" onClick={() => setCityHintDismissed(true)} aria-label="Ne sada">✕</button>
+          </div>
+        </div>
+      )}
+
+      {showCities && <CityPicker onClose={() => setShowCities(false)} />}
+
       {walk && !selected && !showList && (
         <WalkBanner
           walk={walk}
@@ -208,7 +238,7 @@ export function MapScreen({ walk, onEndWalk }: Props) {
         />
       )}
 
-      {nearby && !selected && !walk && (
+      {nearby && !selected && !walk && !suggestCity && (
         <NearbyToast
           landmark={nearby}
           onOpen={() => {
@@ -222,7 +252,7 @@ export function MapScreen({ walk, onEndWalk }: Props) {
       {showList && (
         <section className="sheet sheet-list">
           <div className="sheet-handle" />
-          <h2>Znamenitosti Rijeke</h2>
+          <h2>Znamenitosti – {city.name}</h2>
           <ul className="list">
             {sorted.map((l) => (
               <li key={l.id}>

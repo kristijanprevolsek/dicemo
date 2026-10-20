@@ -1,4 +1,4 @@
-import type { Landmark } from '../data/landmarks'
+import type { Landmark } from '../cities/types'
 
 interface Props {
   landmark: Landmark

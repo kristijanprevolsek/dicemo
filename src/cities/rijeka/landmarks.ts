@@ -1,16 +1,4 @@
-export type Category = 'sakralno' | 'povijest' | 'kultura' | 'more'
-
-export interface Landmark {
-  id: string
-  name: string
-  category: Category
-  lat: number
-  lng: number
-  /** Udaljenost (m) na kojoj se korisniku nudi priča. */
-  radius: number
-  summary: string
-  story: string[]
-}
+import type { Landmark } from '../types'
 
 // NAPOMENA: koordinate su približne i treba ih provjeriti na terenu prije objave.
 // Tekstove priča prije objave treba pregledati povjesničar / turistička zajednica.
@@ -198,12 +186,3 @@ export const landmarks: Landmark[] = [
     ],
   },
 ]
-
-export const categoryLabels: Record<Category, string> = {
-  sakralno: 'Sakralno',
-  povijest: 'Povijest',
-  kultura: 'Kultura',
-  more: 'More i luka',
-}
-
-export const RIJEKA_CENTER: [number, number] = [45.3271, 14.4422]

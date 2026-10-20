@@ -1,5 +1,5 @@
-import type { Landmark } from '../data/landmarks'
-import type { Walk } from '../data/walks'
+import type { Landmark } from '../cities/types'
+import type { Walk } from '../cities/types'
 import { formatDistance } from '../lib/geo'
 
 interface Props {

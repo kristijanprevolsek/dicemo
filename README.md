@@ -1,10 +1,34 @@
-# Dićemo – priče Rijeke
+# Dićemo – priče hrvatskih gradova
 
-Interaktivna karta Rijeke sa znamenitostima. Kad korisnik prolazi pored neke znamenitosti
+Interaktivna karta grada sa znamenitostima, trenutno za **Rijeku, Zagreb i Osijek**. Kad korisnik prolazi pored neke znamenitosti
 (npr. katedrale sv. Vida), aplikacija mu ponudi priču o njoj, koju može pročitati ili poslušati.
 
 **Stack:** React + TypeScript + Vite · Leaflet/OpenStreetMap · Firebase Auth (e-mail i Google) ·
 Capacitor (isti kod se pakira kao iOS i Android aplikacija).
+
+## Gradovi
+
+Svaki grad je zaseban paket podataka u `src/cities/<grad>/`, a sav kod je zajednički. Paket
+sadrži znamenitosti s pričama, šetnje, pitanja za kviz, značke specifične za grad, nagradu i
+primjer događanja (tip `City` u `src/cities/types.ts`).
+
+- Grad se mijenja dodirom na njegovo ime u gornjem lijevom kutu karte.
+- Ako GPS pokaže da je korisnik u drugom podržanom gradu (do 25 km od središta),
+  aplikacija ponudi prebacivanje.
+- Svaki grad ima svoju putovnicu, pečate i značke. Opće značke (Prvi pečat, Znalac, Šetač,
+  Vodič) postoje u svim gradovima, a uz njih svaki grad definira svoje.
+- Feed događanja dobiva parametar `?city=<id>`.
+
+### Dodavanje novog grada
+
+1. Kopiraj `src/cities/osijek/` (najmanji primjer) u npr. `src/cities/split/` i promijeni sadržaj.
+   Id-evi znamenitosti moraju biti jedinstveni u svim gradovima, pa koristi prefiks (`st-…`).
+2. Dodaj grad u popis u `src/cities/index.ts`.
+3. Pokreni `npm run check-cities`. Skripta provjerava da šetnje, pitanja i značke pokazuju na
+   postojeće znamenitosti, da svaka znamenitost ima pitanje i da koordinate nisu daleko od grada.
+
+Kasnije se gradovi mogu seliti u bazu (Firestore ili CMS). Tada bi turističke zajednice mogle
+same uređivati sadržaj, a nova verzija aplikacije ne bi bila potrebna za svaki novi grad.
 
 ## Pokretanje
 
@@ -50,7 +74,7 @@ i u `src/auth/AuthContext.tsx` na nativnoj platformi pozvati njegov `signInWithG
 
 ## Šetnje
 
-Tab **Šetnje** nudi tematske rute (`src/data/walks.ts`): „Rijeka u 60 minuta“ i „Trsat“.
+Tab **Šetnje** nudi tematske rute (`walks` u paketu grada), npr. „Rijeka u 60 minuta“ ili „Kaptol i Gornji grad“.
 Nakon pokretanja ruta se iscrta na karti s numeriranim točkama. Banner pokazuje sljedeću
 točku, udaljenost do nje i kratku uputu. Kad korisnik stigne na točku, sama se otvori
 njezina priča, a može i ručno potvrditi „Stigao sam“.
@@ -59,7 +83,7 @@ Pješačka linija dolazi s javnog OSRM poslužitelja `routing.openstreetmap.de`.
 dostupan, između točaka se crtaju isprekidane ravne linije. Za produkciju treba vlastiti ili
 komercijalni servis za rute (GraphHopper, Mapbox, OpenRouteService).
 
-Nova šetnja je novi zapis u `walks.ts`: popis id-eva znamenitosti redom, uz kratke upute.
+Nova šetnja je novi zapis u `walks` paketa grada: popis id-eva znamenitosti redom, uz kratke upute.
 
 ## Nekad i sad (stare fotografije)
 
@@ -91,10 +115,10 @@ stara. Te bi se fotografije isplatilo snimiti same.
 ## Igra: putovnica, kviz i značke
 
 - **Pečat:** dobiva se kad korisnik fizički dođe do znamenitosti.
-- **Kviz:** na dnu priče je jedno pitanje (`src/data/quiz.ts`), otključano tek na licu mjesta.
+- **Kviz:** na dnu priče je jedno pitanje (`quiz` u paketu grada), otključano tek na licu mjesta.
   Ako je odgovor točan iz prve, pečat dobiva zvjezdicu ★.
-- **Značke** (`src/data/badges.ts`): Prvi pečat, Stari grad, Trsatski hodočasnik, Uz more,
-  Znalac, Šetač i Riječki vodič. Kad korisnik osvoji značku, iskače obavijest.
+- **Značke** (`src/data/badges.ts` + `badges` u paketu grada): opće (Prvi pečat, Znalac, Šetač,
+  Vodič) i gradske (npr. Stari grad i Trsatski hodočasnik u Rijeci, Gornji grad u Zagrebu). Kad korisnik osvoji značku, iskače obavijest.
 - **Nagrada:** primjer „kava u partnerskom kafiću“ nakon 10 pečata. Partneri još nisu
   dogovoreni, a kod je zasad samo prikaz. Za stvarne nagrade kod treba izdavati i
   provjeravati na serveru, da se ne može lažirati.
@@ -144,23 +168,23 @@ partnerstvo, npr. s TZ-om, kojima je u interesu da se njihova događanja vide.
 
 ```
 src/
-  data/landmarks.ts      znamenitosti: koordinate, radijus okidanja, priče
+  cities/                paketi gradova (rijeka/, zagreb/, osijek/) + tipovi i odabir grada
+  data/photos.json       stare i današnje fotografije (+ autor i licenca)
+  data/badges.ts         opće značke
+  data/events.ts         model događanja + primjer podataka
   hooks/useLocation.ts   praćenje GPS lokacije (web + nativno)
   hooks/useProximity.ts  otkriva ulazak u radijus znamenitosti
   hooks/useWalkRoute.ts  pješačka ruta šetnje (OSRM, s fallbackom)
-scripts/fetch-photos.mjs skidanje fotografija s Wikimedia Commonsa
-  auth/AuthContext.tsx   Firebase prijava (e-mail, Google, demo gost)
-  data/walks.ts          tematske šetnje
-  data/quiz.ts           pitanje za svaku znamenitost
-  data/badges.ts         značke i nagrada
-  progress/              napredak korisnika (pečati, kviz, šetnje)
-  data/photos.json       stare i današnje fotografije (+ autor i licenca)
-  data/events.ts         model događanja + primjer podataka
+  progress/              napredak korisnika po gradu (pečati, kviz, šetnje)
   lib/events.ts          učitavanje feeda, filtriranje na 10 dana, grupiranje po danu
-  components/            prijava, karta, događanja, tab bar, panel s pričom
+  auth/AuthContext.tsx   Firebase prijava (e-mail, Google, demo gost)
+  components/            prijava, karta, šetnje, putovnica, događanja, odabir grada…
+scripts/
+  fetch-photos.mjs       skidanje fotografija s Wikimedia Commonsa
+  check-cities.ts        provjera podataka gradova
 ```
 
-Nova znamenitost dodaje se kao novi zapis u `src/data/landmarks.ts`.
+Nova znamenitost dodaje se u `landmarks` paketa odgovarajućeg grada u `src/cities/`.
 
 ## Prije objave
 

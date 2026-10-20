@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { quiz } from '../data/quiz'
+import { useCity } from '../cities/CityContext'
 import { useProgress } from '../progress/ProgressContext'
 
 /** Miješanje s fiksnim sjemenom (id) – isti redoslijed pri svakom prikazu. */
@@ -19,7 +19,7 @@ function shuffled<T>(items: T[], seed: string): T[] {
 }
 
 export function QuizCard({ landmarkId, unlocked }: { landmarkId: string; unlocked: boolean }) {
-  const q = quiz[landmarkId]
+  const q = useCity().city.quiz[landmarkId]
   const { progress, answerQuiz } = useProgress()
   const [picked, setPicked] = useState<string | null>(null)
   const options = useMemo(() => (q ? shuffled(q.options, landmarkId) : []), [q, landmarkId])

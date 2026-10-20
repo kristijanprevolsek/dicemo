@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Landmark } from '../data/landmarks'
+import type { Landmark } from '../cities/types'
 import { distanceMeters, type Position } from '../lib/geo'
 
 /**

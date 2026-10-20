@@ -1,8 +1,4 @@
-export interface QuizQuestion {
-  question: string
-  /** Prvi odgovor je točan; redoslijed se miješa pri prikazu. */
-  options: [string, string, string]
-}
+import type { QuizQuestion } from '../types'
 
 // Pitanja se oslanjaju na tekstove priča – kad se priča promijeni, provjeriti i pitanje.
 export const quiz: Record<string, QuizQuestion> = {

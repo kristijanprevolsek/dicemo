@@ -31,7 +31,7 @@ export function LoginScreen() {
     <main className="login">
       <div className="login-card">
         <h1 className="brand">Dićemo</h1>
-        <p className="tagline">Prošeći Rijekom i poslušaj priče koje grad čuva.</p>
+        <p className="tagline">Prošeći gradom i poslušaj priče koje čuva.</p>
 
         <button className="btn btn-google" disabled={busy || demoMode} onClick={() => run(signInGoogle)}>
           <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
