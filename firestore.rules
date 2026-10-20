@@ -1,0 +1,28 @@
+rules_version = '2';
+
+// Sadržaj gradova čitaju svi; uređuju samo urednici.
+// Urednik = dokument editors/{uid} s poljem cities: ["rijeka"] ili ["*"] za sve gradove.
+// Urednike dodaje administrator ručno u Firebase konzoli.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function editorCities() {
+      return get(/databases/$(database)/documents/editors/$(request.auth.uid)).data.cities;
+    }
+    function isEditor() {
+      return request.auth != null && exists(/databases/$(database)/documents/editors/$(request.auth.uid));
+    }
+    function canEdit(cityId) {
+      return isEditor() && ('*' in editorCities() || cityId in editorCities());
+    }
+
+    match /cities/{cityId} {
+      allow read: if true;
+      allow write: if canEdit(cityId);
+    }
+
+    match /editors/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}

@@ -73,6 +73,7 @@ h1, h2, p { margin: 0; }
   background: var(--surface);
   font-weight: 600;
 }
+a.btn { text-decoration: none; }
 .btn-primary { background: var(--primary); color: var(--primary-text); border-color: transparent; }
 .btn-secondary { background: var(--bg); }
 .btn-small { width: auto; padding: 8px 12px; font-size: 0.9rem; }

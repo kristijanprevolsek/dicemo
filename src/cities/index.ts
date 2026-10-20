@@ -4,17 +4,14 @@ import { rijeka } from './rijeka'
 import type { City } from './types'
 import { zagreb } from './zagreb'
 
-/** Novi grad: napravi mapu u src/cities/<grad>/ po uzoru na postojeće i dodaj ga ovdje. */
-export const cities: City[] = [rijeka, zagreb, osijek]
-
-export const DEFAULT_CITY = rijeka
-
-export function getCity(id: string | null | undefined): City {
-  return cities.find((c) => c.id === id) ?? DEFAULT_CITY
-}
+/**
+ * Sadržaj ugrađen u aplikaciju. Služi kao početni sadržaj i rezerva kad baza nije dostupna;
+ * izmjene iz admin sučelja (src/admin) ga nadjačavaju.
+ */
+export const bundledCities: City[] = [rijeka, zagreb, osijek]
 
 /** Grad u čijoj je blizini korisnik (do 25 km od središta), ili null. */
-export function nearestCity(pos: Position, maxMeters = 25_000): City | null {
+export function nearestCity(pos: Position, cities: City[], maxMeters = 25_000): City | null {
   let best: { city: City; d: number } | null = null
   for (const city of cities) {
     const d = distanceMeters(pos, { lat: city.center[0], lng: city.center[1] })

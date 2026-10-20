@@ -27,8 +27,43 @@ primjer događanja (tip `City` u `src/cities/types.ts`).
 3. Pokreni `npm run check-cities`. Skripta provjerava da šetnje, pitanja i značke pokazuju na
    postojeće znamenitosti, da svaka znamenitost ima pitanje i da koordinate nisu daleko od grada.
 
-Kasnije se gradovi mogu seliti u bazu (Firestore ili CMS). Tada bi turističke zajednice mogle
-same uređivati sadržaj, a nova verzija aplikacije ne bi bila potrebna za svaki novi grad.
+Gradovi se mogu dodavati i kroz admin sučelje (vidi dolje), bez izmjena koda.
+
+## Uređivanje sadržaja (admin)
+
+Na adresi **`/admin.html`** (lokalno http://localhost:5173/admin.html) nalazi se sučelje za
+uređivanje sadržaja gradova, bez programiranja:
+
+- **Znamenitosti:** naziv, kategorija, kratki opis, priča, lokacija (klik na kartu ili
+  povlačenje oznake), radijus okidanja i pitanje za kviz s točnim i netočnim odgovorima.
+- **Šetnje:** naziv, trajanje, opis, točke redom (dodaj, pomakni gore ili dolje, ukloni) i
+  uputa za svaku točku, uz pregled rute na karti.
+- **Grad, nagrada i značke:** ime grada, središte i zoom karte, nagrada i gradske značke.
+- **Novi grad:** polje „Novi grad…“ u zaglavlju (samo urednici sa svim gradovima).
+- **Objava:** sučelje stalno provjerava sadržaj (iste provjere kao `npm run check-cities`) i ne
+  dopušta objavu dok postoje greške, npr. znamenitost bez pitanja ili šetnja s nepostojećom
+  točkom. Tu su i „Odbaci“, „Vrati izvorno“ te **Izvezi/Uvezi JSON**, zgodno ako turistička
+  zajednica pošalje sadržaj kao datoteku.
+
+### Gdje se sprema
+
+- **Bez Firebasea (demo):** izmjene se spremaju u preglednik, u isti localStorage kao i
+  aplikacija. Aplikacija na istom računalu odmah ih vidi, ali nitko drugi ne.
+- **S Firebaseom:** izmjene idu u Firestore (`cities/{id}`), a aplikacija ih učitava pri
+  pokretanju. Ugrađeni sadržaj iz `src/cities/` služi kao početni sadržaj i rezerva ako baza
+  nije dostupna. Za novi grad ili ispravak priče nije potrebna nova verzija aplikacije.
+
+### Postavljanje urednika (Firebase)
+
+1. U Firebase konzoli uključi **Firestore** i objavi pravila iz `firestore.rules`
+   (`firebase deploy --only firestore:rules` ili kopiraj u konzolu).
+2. Urednik se prijavi na `/admin.html`. Aplikacija mu pokaže poruku „Nemaš prava uređivanja“
+   i njegov korisnički id.
+3. U Firestoreu napravi dokument `editors/<taj id>` s poljem `cities` (array):
+   - `["rijeka"]` – smije uređivati samo Rijeku (npr. TZ grada Rijeke)
+   - `["*"]` – smije uređivati sve gradove i dodavati nove
+
+Pravila dopuštaju svima čitanje sadržaja, a pisanje samo urednicima za njihove gradove.
 
 ## Pokretanje
 
@@ -168,7 +203,9 @@ partnerstvo, npr. s TZ-om, kojima je u interesu da se njihova događanja vide.
 
 ```
 src/
-  cities/                paketi gradova (rijeka/, zagreb/, osijek/) + tipovi i odabir grada
+  cities/                ugrađeni paketi gradova + tipovi, odabir grada i provjera sadržaja
+  content/repository.ts  izvor sadržaja: Firestore ili (demo) localStorage
+  admin/                 sučelje za uređivanje sadržaja (/admin.html)
   data/photos.json       stare i današnje fotografije (+ autor i licenca)
   data/badges.ts         opće značke
   data/events.ts         model događanja + primjer podataka

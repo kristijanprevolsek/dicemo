@@ -1,8 +1,7 @@
-import { cities } from '../cities'
 import { useCity } from '../cities/CityContext'
 
 export function CityPicker({ onClose }: { onClose: () => void }) {
-  const { city: current, setCity } = useCity()
+  const { city: current, cities, setCity } = useCity()
   return (
     <section className="sheet sheet-list" aria-label="Odaberi grad">
       <div className="sheet-handle" />

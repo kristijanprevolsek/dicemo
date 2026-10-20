@@ -62,7 +62,7 @@ interface Props {
 
 export function MapScreen({ walk, onEndWalk }: Props) {
   const { user, signOut } = useAuth()
-  const { city, setCity } = useCity()
+  const { city, cities, setCity } = useCity()
   const { landmarks } = city
   const landmarkById = useMemo(() => new Map(landmarks.map((l) => [l.id, l])), [landmarks])
   const [showCities, setShowCities] = useState(false)
@@ -132,7 +132,7 @@ export function MapScreen({ walk, onEndWalk }: Props) {
   }, [position, landmarks])
 
   // Korisnik je fizički u drugom podržanom gradu – ponudi prebacivanje.
-  const detectedCity = position ? nearestCity(position) : null
+  const detectedCity = position ? nearestCity(position, cities) : null
   const suggestCity = detectedCity && detectedCity.id !== city.id && !cityHintDismissed ? detectedCity : null
 
   const statusText = simulate
